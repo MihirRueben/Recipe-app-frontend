@@ -21,7 +21,7 @@ const CreateRecipe = () => {
         try {
             // 1. Prepare the Image for Upload
             const formData = new FormData();
-            formData.append('image', file); 
+            formData.append('image', file); //appending file to the name image
 
             // 2. Upload the image to get the URL back
             const imageResponse = await api.post('/images/upload', formData, {
