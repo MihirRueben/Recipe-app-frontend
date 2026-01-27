@@ -1,48 +1,25 @@
-import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import api from '../api/axiosConfig';
-import RecipeCard from '../components/RecipeCard';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-    const { user } = useAuth();
-    const [recipes, setRecipes] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        if (user) {
-            api.get(`/recipes/user/${user.id}`)
-            .then(res => setMyrecipes(res.data))
-            .catch(err => console.log(err))
-            .finally(() => setLoading(false))
-        }
-    }, [user]);
-
-    if (!user) return <div style={{ textAlign: 'center', marginTop: '50px' }}>Please login to view your profile.</div>;
-    if (loading) return <div style={{ textAlign: 'center', marginTop: '50px' }}>Loading your kitchen...</div>;
+    if (!user) return <p>Please log in.</p>;
 
     return (
-        <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '40px', borderBottom: '2px solid #eee', paddingBottom: '20px' }}>
-                <div style={{ fontSize: '50px' }}>👨‍🍳</div>
-                <h1>{user.username}'s Kitchen</h1>
-                <p style={{ color: '#666' }}>You have shared {myRecipes.length} recipes</p>
+        <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
+            <h1>User Profile</h1>
+            <div style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '12px' }}>
+                <p><strong>Username:</strong> {user.username}</p>
+                <p><strong>Email:</strong> {user.email}</p>
+                <button onClick={() => alert("Update Profile logic goes here!")} style={{ marginRight: '10px' }}>
+                    Edit Profile
+                </button>
+                <button onClick={() => { logout(); navigate('/login'); }} style={{ backgroundColor: '#ff4757', color: 'white', border: 'none', padding: '10px' }}>
+                    Logout
+                </button>
             </div>
-
-            {myRecipes.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#888' }}>
-                    <p>You haven't posted any recipes yet. Start cooking!</p>
-                </div>
-            ) : (
-                <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-                    gap: '30px' 
-                }}>
-                    {myRecipes.map(recipe => (
-                        <RecipeCard key={recipe.id} recipe={recipe} />
-                    ))}
-                </div>
-            )}
         </div>
     );
 };
