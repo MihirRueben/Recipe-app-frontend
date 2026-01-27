@@ -8,12 +8,7 @@ const RecipeCard = ({ recipe }) => {
     const imageUrl = `http://localhost:8080${recipe.imageUrl}`;
 
     const handleViewRecipe = () => {
-        if (!user) {
-            alert("You must be logged in to view the full recipe!");
-            navigate('/login');
-        } else {
-            navigate(`/recipe/${recipe.id}`);
-        }
+        navigate(`/recipe/${recipe.id}`);
     };
 
     const handleImageError = (e) => {
