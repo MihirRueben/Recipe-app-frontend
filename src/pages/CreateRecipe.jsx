@@ -12,46 +12,39 @@ const CreateRecipe = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Safety check: Ensure user is logged in
         if (!user) {
             alert("You must be logged in to post a recipe!");
             return;
         }
 
         try {
-            // 1. Prepare the Image for Upload
+            // 1. Prepare and Upload Image
             const formData = new FormData();
-            formData.append('image', file); //appending file to the name image
+            formData.append('image', file);
 
-            // 2. Upload the image to get the URL back
             const imageResponse = await api.post('/images/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 
-            // Assuming your backend returns just the string URL or an object with the URL
             const imageUrl = imageResponse.data; 
 
-            // 3. Create the final recipe object
+            // 2. Create final object with robust ID check
             const finalRecipe = {
                 title: recipeData.title,
                 description: recipeData.description,
-                imageUrl: imageUrl, // The path from the backend
-                userId: user.id    // Link the recipe to the logged-in user
+                imageUrl: imageUrl,
+                userId: user.id || user._id 
             };
 
-            // 4. Save the actual recipe to MongoDB
+            // 3. Save to MongoDB
             await api.post('/recipes', finalRecipe);
 
             alert("Recipe Created Successfully! 🍳");
-            navigate('/');
+            navigate('/'); 
             
         } catch (err) {
             console.error("Error creating recipe:", err);
-            // Handle 403 or 500 errors specifically
-            const errorMsg = err.response?.status === 403 
-                ? "Access Denied: Please check if you are logged in." 
-                : "Failed to upload recipe. Please try again.";
-            alert(errorMsg);
+            alert(err.response?.status === 403 ? "Access Denied: Please log in again." : "Failed to upload recipe.");
         }
     };
 
@@ -80,9 +73,7 @@ const CreateRecipe = () => {
                     style={{ display: 'block', marginBottom: '20px' }}
                 />
 
-                <button type="submit" style={styles.button}>
-                    Publish Recipe
-                </button>
+                <button type="submit" style={styles.button}>Publish Recipe</button>
             </form>
         </div>
     );

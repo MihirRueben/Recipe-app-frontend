@@ -5,6 +5,9 @@ import Home from './pages/Home';
 import AuthPage from './pages/AuthPage';
 import CreateRecipe from './pages/CreateRecipe';
 import Profile from './pages/Profile';
+import MyRecipes from './pages/MyRecipes';
+import EditRecipe from './pages/EditRecipe';
+
 
 function App() {
   return (
@@ -14,10 +17,13 @@ function App() {
         <div className="app-container">
           
         <Routes>
-          <Route path="/" element={<Home />} />
+           <Route path="/" element={<Home />} />
            <Route path="/login" element={<AuthPage />} /> 
            <Route path="/profile/" element={<Profile />} /> 
            <Route path="/create" element={<CreateRecipe />} /> 
+           <Route path="/my-recipes" element={<MyRecipes />} /> 
+           <Route path="/edit/:id" element={<EditRecipe />} />
+           <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </Router>

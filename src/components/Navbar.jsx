@@ -21,7 +21,8 @@ const Navbar = () => {
                 {user ? (
                     <>
                         <li><Link to="/create" style={styles.link}>Post Recipe</Link></li>
-                        <li><Link to="/profile" style={styles.link}>My Kitchen</Link></li>
+                        <li><Link to="/profile" style={styles.link}>My Account</Link></li>
+                        <li><Link to="/my-recipes" style={styles.link}>My Recipes</Link></li>
                         <li>
                             <button onClick={handleLogout} style={styles.logoutBtn}>
                                 Logout ({user.username})
