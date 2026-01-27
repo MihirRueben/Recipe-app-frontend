@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axiosConfig';
 import { useNavigate } from 'react-router-dom';
+import { Plus, Edit3, Trash2, ChefHat, Clock, Users } from 'lucide-react';
 
 const MyRecipes = () => {
     const [myRecipes, setMyRecipes] = useState([]);
@@ -49,33 +50,106 @@ const MyRecipes = () => {
         }
     };
 
-    if (loading) return <div style={{ textAlign: 'center', padding: '50px' }}>Loading your kitchen...</div>;
-    if (!user) return <div style={{ textAlign: 'center', padding: '50px' }}>Please log in to manage recipes.</div>;
+    if (loading) return (
+        <div className="container">
+            <div className="text-center py-12">
+                <div className="loading-spinner large"></div>
+                <p className="mt-4 text-secondary">Loading your kitchen...</p>
+            </div>
+        </div>
+    );
+    
+    if (!user) return (
+        <div className="container">
+            <div className="text-center py-12">
+                <ChefHat size={48} className="mx-auto text-muted mb-4" />
+                <h2 className="text-2xl font-semibold mb-2">Please log in</h2>
+                <p className="text-secondary">You need to be logged in to manage your recipes.</p>
+            </div>
+        </div>
+    );
 
     return (
-        <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
-            <h2 style={{ marginBottom: '30px', borderBottom: '2px solid #ff4757', paddingBottom: '10px' }}>
-                My Kitchen Cabinet
-            </h2>
+        <div className="container">
+            <div className="my-recipes-header">
+                <div className="header-content">
+                    <h1 className="page-title">My Kitchen Cabinet</h1>
+                    <p className="page-subtitle">Manage and organize your culinary creations</p>
+                </div>
+                <button 
+                    onClick={() => navigate('/create')} 
+                    className="btn btn-primary"
+                >
+                    <Plus size={20} />
+                    New Recipe
+                </button>
+            </div>
             
             {myRecipes.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '40px', backgroundColor: '#f9f9f9', borderRadius: '10px' }}>
-                    <p>You haven't shared any recipes yet!</p>
-                    <button onClick={() => navigate('/create')} style={editBtn}>Post Your First Recipe</button>
+                <div className="empty-state">
+                    <div className="empty-icon">
+                        <ChefHat size={64} />
+                    </div>
+                    <h2 className="empty-title">No recipes yet!</h2>
+                    <p className="empty-description">
+                        You haven't shared any recipes with the community yet.
+                        Start by creating your first culinary masterpiece!
+                    </p>
+                    <button 
+                        onClick={() => navigate('/create')} 
+                        className="btn btn-primary btn-lg"
+                    >
+                        <Plus size={20} />
+                        Create Your First Recipe
+                    </button>
                 </div>
             ) : (
-                <div style={gridStyle}>
+                <div className="recipes-grid">
                     {myRecipes.map(recipe => (
-                        <div key={recipe.id} style={cardStyle}>
-                            <img 
-                                src={`http://localhost:8080${recipe.imageUrl}`} 
-                                alt={recipe.title} 
-                                style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '6px' }} 
-                            />
-                            <h4 style={{ margin: '15px 0 10px 0' }}>{recipe.title}</h4>
-                            <div style={{ display: 'flex', gap: '10px' }}>
-                                <button onClick={() => navigate(`/edit/${recipe.id}`)} style={editBtn}>Edit</button>
-                                <button onClick={() => handleDelete(recipe.id)} style={delBtn}>Delete</button>
+                        <div key={recipe.id} className="recipe-card">
+                            <div className="recipe-image-container">
+                                <img 
+                                    src={`http://localhost:8080${recipe.imageUrl}`} 
+                                    alt={recipe.title} 
+                                    className="recipe-image"
+                                    onError={(e) => {
+                                        e.target.src = '/placeholder-recipe.jpg';
+                                    }}
+                                />
+                                <div className="recipe-overlay">
+                                    <div className="recipe-stats">
+                                        <span className="stat-item">
+                                            <Clock size={14} />
+                                            <span>Quick</span>
+                                        </span>
+                                        <span className="stat-item">
+                                            <Users size={14} />
+                                            <span>4 servings</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="recipe-content">
+                                <h3 className="recipe-title">{recipe.title}</h3>
+                                <p className="recipe-description">
+                                    {recipe.description?.substring(0, 100)}...
+                                </p>
+                                <div className="recipe-actions">
+                                    <button 
+                                        onClick={() => navigate(`/edit/${recipe.id}`)} 
+                                        className="btn btn-secondary btn-sm"
+                                    >
+                                        <Edit3 size={16} />
+                                        Edit
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDelete(recipe.id)} 
+                                        className="btn btn-accent btn-sm"
+                                    >
+                                        <Trash2 size={16} />
+                                        Delete
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -84,10 +158,5 @@ const MyRecipes = () => {
         </div>
     );
 };
-
-const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '25px' };
-const cardStyle = { padding: '20px', border: '1px solid #eee', borderRadius: '12px', backgroundColor: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' };
-const delBtn = { backgroundColor: '#ff4757', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', flex: 1 };
-const editBtn = { backgroundColor: '#ffa502', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', flex: 1 };
 
 export default MyRecipes;
