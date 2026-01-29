@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axiosConfig';
-import { User, Mail, Edit3, Save, X, Camera } from 'lucide-react';
+import { User, Mail, Edit3, Save, X, Camera, RefreshCw } from 'lucide-react';
+import { getUserAvatarUrl, getRandomAvatarStyle } from '../utils/avatarUtils';
 
 const Profile = () => {
     const { user, login } = useAuth(); 
     const [isEditing, setIsEditing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [avatarStyle, setAvatarStyle] = useState(user?.avatarStyle || 'adventurer');
     const [formData, setFormData] = useState({
         username: user?.username || '',
         email: user?.email || '',
@@ -19,7 +21,11 @@ const Profile = () => {
         
         try {
             const id = user.id || user._id;
-            const res = await api.put(`/users/${id}`, formData);
+            const updateData = {
+                ...formData,
+                avatarStyle: avatarStyle
+            };
+            const res = await api.put(`/users/${id}`, updateData);
             login(res.data);
             setIsEditing(false);
             alert("Profile updated successfully! ✨");
@@ -37,7 +43,13 @@ const Profile = () => {
             email: user?.email || '',
             bio: user?.bio || ''
         });
+        setAvatarStyle(user?.avatarStyle || 'adventurer');
         setIsEditing(false);
+    };
+
+    const regenerateAvatar = () => {
+        const newStyle = getRandomAvatarStyle();
+        setAvatarStyle(newStyle);
     };
 
     if (!user) return (
@@ -56,10 +68,24 @@ const Profile = () => {
                 <div className="profile-header">
                     <div className="profile-avatar">
                         <div className="avatar-placeholder">
-                            <User size={48} />
+                            <img 
+                                src={getUserAvatarUrl(user, avatarStyle)} 
+                                alt="Profile Avatar"
+                                className="avatar-image"
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.style.display = 'none';
+                                    e.target.nextSibling.style.display = 'flex';
+                                }}
+                            />
+                            <User size={48} style={{ display: 'none' }} />
                         </div>
-                        <button className="avatar-upload-btn">
-                            <Camera size={16} />
+                        <button 
+                            className="avatar-upload-btn"
+                            onClick={isEditing ? regenerateAvatar : undefined}
+                            title={isEditing ? "Regenerate Avatar" : "Edit profile to change avatar"}
+                        >
+                            {isEditing ? <RefreshCw size={16} /> : <Camera size={16} />}
                         </button>
                     </div>
                     <div className="profile-info">
@@ -111,6 +137,36 @@ const Profile = () => {
                                     placeholder="Tell us about yourself..."
                                     rows={4}
                                 />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">
+                                    <RefreshCw size={16} className="input-icon" />
+                                    Avatar Style
+                                </label>
+                                <div className="avatar-customization">
+                                    <div className="current-avatar-preview">
+                                        <img 
+                                            src={getUserAvatarUrl(user, avatarStyle)} 
+                                            alt="Avatar Preview"
+                                            className="preview-avatar"
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'flex';
+                                            }}
+                                        />
+                                        <User size={40} style={{ display: 'none' }} />
+                                    </div>
+                                    <button 
+                                        type="button"
+                                        onClick={regenerateAvatar}
+                                        className="btn btn-outline btn-sm"
+                                    >
+                                        <RefreshCw size={14} />
+                                        Regenerate Avatar
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="form-actions">
